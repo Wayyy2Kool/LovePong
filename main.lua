@@ -43,7 +43,7 @@ function love.load()
 end
 
 function love.update(dt)
-    --Why is the com so choppy? He's so fucking scared. He's shaking
+    --Why is the com so choppy? He's so fucking scared. He's
     if com.y + paddle.h / 2 < ball.y then
         com.y = com.y + com.speed
     end
@@ -97,6 +97,7 @@ function love.update(dt)
         ball.x + ball.width > com.x and -- Checks if the com is left of the ball (or ball right of com)
         ball.y < com.y + com.height and -- Checks if the ball is above the com
         ball.y + ball.height > com.y then -- Checks if the com is above the ball (or ball below com)
+        ball.x = ball.x - 1
         ball.vx = -ball.vx
     end
 
@@ -105,6 +106,7 @@ function love.update(dt)
         ball.x + ball.width > player.x and
         ball.y < player.y + player.height and
         ball.y + ball.height > player.y then
+        ball.x = ball.x + 1
         ball.vx = -ball.vx  
     end
 
