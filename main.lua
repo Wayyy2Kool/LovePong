@@ -23,7 +23,7 @@ function love.load()
     com = {}
         com.x = 730
         com.y = (game_height/2) - (paddle.h/2)
-        com.speed = 5
+        com.speed = 10
         com.width = 10
         com.height = 65
     score = {}
@@ -43,13 +43,14 @@ function love.load()
 end
 
 function love.update(dt)
-    --Why is the com so choppy? He's so fucking scared. He's
+    --Com code
+    --Need to fix 'speed match' bug
     if com.y + paddle.h / 2 < ball.y then
-        com.y = com.y + com.speed
+        com.y = math.min(com.y + com.speed, ball.y)
     end
 
     if com.y + paddle.h / 2 > ball.y then
-        com.y = com.y - com.speed
+        com.y = math.max(com.y - com.speed, ball.y)
     end
 
     --player controller
@@ -114,14 +115,10 @@ function love.update(dt)
     if ball.x < 0 then
         ball.x = game_width/2
         ball.y = game_height/2
-        player.y = (game_height/2) - (paddle.h/2)
-        com.y = (game_height/2) - (paddle.h/2)
         score.com = score.com + 1
     elseif ball.x > game_width then
         ball.x = game_width/2
         ball.y = game_height/2
-        player.y = (game_height/2) - (paddle.h/2)
-        com.y = (game_height/2) - (paddle.h/2)
         score.player = score.player + 1       
     end
 end
