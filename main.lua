@@ -1,5 +1,10 @@
 -- PONG Project
 
+--  TO DO LIST:
+--  - Improve the com player code
+--  - Improve the ball physics (angle and speed velocity)
+--  - Add charge mechanic
+
 function love.load()
     game_height = 600
     game_width = 800   
@@ -18,7 +23,7 @@ function love.load()
     com = {}
         com.x = 730
         com.y = (game_height/2) - (paddle.h/2)
-        com.speed = 4
+        com.speed = 5
         com.width = 10
         com.height = 65
     score = {}
@@ -38,8 +43,14 @@ function love.load()
 end
 
 function love.update(dt)
-    --TEMP SUPER ADVANCED COM CODE (TOO COMPLICATED FOR ANYONE TO UNDERSTAND)
-    com.y = ball.y - (com.height/2)
+    --Why is the com so choppy? He's so fucking scared. He's shaking
+    if com.y + paddle.h / 2 < ball.y then
+        com.y = com.y + com.speed
+    end
+
+    if com.y + paddle.h / 2 > ball.y then
+        com.y = com.y - com.speed
+    end
 
     --player controller
     if love.keyboard.isDown("up") then
@@ -101,10 +112,14 @@ function love.update(dt)
     if ball.x < 0 then
         ball.x = game_width/2
         ball.y = game_height/2
+        player.y = (game_height/2) - (paddle.h/2)
+        com.y = (game_height/2) - (paddle.h/2)
         score.com = score.com + 1
     elseif ball.x > game_width then
         ball.x = game_width/2
         ball.y = game_height/2
+        player.y = (game_height/2) - (paddle.h/2)
+        com.y = (game_height/2) - (paddle.h/2)
         score.player = score.player + 1       
     end
 end
