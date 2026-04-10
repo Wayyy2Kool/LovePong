@@ -3,17 +3,21 @@
 function love.load()
     game_height = 600
     game_width = 800   
+
+    paddle = {}
+        paddle.w = 10
+        paddle.h = 65    
     
     player = {}
         player.x = 60
-        player.y = game_height/2
+        player.y = (game_height/2) - (paddle.h/2)
         player.speed = 5
         player.width = 10
         player.height = 65
 
     com = {}
         com.x = 730
-        com.y = 300
+        com.y = (game_height/2) - (paddle.h/2)
         com.speed = 4
         com.width = 10
         com.height = 65
@@ -21,13 +25,11 @@ function love.load()
         score.player = 0
         score.com = 0
     
-    paddle = {}
-        paddle.w = 10
-        paddle.h = 65
+
     
     ball = {}
-        ball.x = 400
-        ball.y = 300
+        ball.x = game_width/2
+        ball.y = game_height/2
         ball.vx = 100
         ball.vy = 100
         ball.width = 10
@@ -38,8 +40,6 @@ end
 function love.update(dt)
     --TEMP SUPER ADVANCED COM CODE (TOO COMPLICATED FOR ANYONE TO UNDERSTAND)
     com.y = ball.y - (com.height/2)
-
-   
 
     --player controller
     if love.keyboard.isDown("up") then
@@ -63,6 +63,7 @@ function love.update(dt)
     if com.y < 0 then
         com.y = 0
     end
+
     if com.y > (game_height - paddle.h) then
         com.y = (game_height - paddle.h)
     end
@@ -93,7 +94,18 @@ function love.update(dt)
         ball.x + ball.width > player.x and
         ball.y < player.y + player.height and
         ball.y + ball.height > player.y then
-        ball.vx = -ball.vx    
+        ball.vx = -ball.vx  
+    end
+
+    --score and reset system
+    if ball.x < 0 then
+        ball.x = game_width/2
+        ball.y = game_height/2
+        score.com = score.com + 1
+    elseif ball.x > game_width then
+        ball.x = game_width/2
+        ball.y = game_height/2
+        score.player = score.player + 1       
     end
 end
 
