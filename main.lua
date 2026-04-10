@@ -17,6 +17,7 @@ function love.load()
         player.x = 60
         player.y = (game_height/2) - (paddle.h/2)
         player.speed = 5
+        player.v = 0.1
         player.width = 10
         player.height = 65
 
@@ -40,6 +41,13 @@ function love.load()
         ball.width = 10
         ball.height = 10
 
+    --AABB Collision Function
+    function isCollide(a, b)
+        return a.x < b.x + b.width and
+               a.x + a.width > b.x  and
+               a.y < b.y + b.height and
+               a.y + a.height > b.y
+    end
 end
 
 function love.update(dt)
@@ -52,6 +60,7 @@ function love.update(dt)
     if com.y + paddle.h / 2 > ball.y then
         com.y = math.max(com.y - com.speed, ball.y)
     end
+
 
     --player controller
     if love.keyboard.isDown("up") then
@@ -94,21 +103,15 @@ function love.update(dt)
     end
 
     --com collision
-    if ball.x < com.x + com.width and -- Checks if the ball is to the left of com
-        ball.x + ball.width > com.x and -- Checks if the com is left of the ball (or ball right of com)
-        ball.y < com.y + com.height and -- Checks if the ball is above the com
-        ball.y + ball.height > com.y then -- Checks if the com is above the ball (or ball below com)
+    if isCollide(ball, com) then
         ball.x = ball.x - 1
         ball.vx = -ball.vx
     end
 
     --player collision
-    if ball.x < player.x + player.width and
-        ball.x + ball.width > player.x and
-        ball.y < player.y + player.height and
-        ball.y + ball.height > player.y then
+    if isCollide(ball, player) then
         ball.x = ball.x + 1
-        ball.vx = -ball.vx  
+        ball.vx = -ball.vx
     end
 
     --score and reset system
@@ -136,4 +139,7 @@ function love.draw()
     --draw scores
     love.graphics.print(score.player, 200, 60, 0, 2, 2)
     love.graphics.print(score.com, 600, 60, 0, 2, 2)
+
+    --TEMP draw player.speed
+    love.graphics.print(player.speed, 20, 20, 0, 1, 1)
 end
