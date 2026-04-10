@@ -30,7 +30,6 @@ function love.load()
         ball.y = 300
         ball.vx = 100
         ball.vy = 100
-        ball.speed = 25
         ball.width = 10
         ball.height = 10
 
@@ -40,9 +39,7 @@ function love.update(dt)
     --TEMP SUPER ADVANCED COM CODE (TOO COMPLICATED FOR ANYONE TO UNDERSTAND)
     com.y = ball.y - (com.height/2)
 
-    if com.y > (game_height - paddle.h) then
-        com.y = (game_height - paddle.h)
-    end
+   
 
     --player controller
     if love.keyboard.isDown("up") then
@@ -58,15 +55,23 @@ function love.update(dt)
         player.y = 0
     end
 
-    if player.y > 535 then
-        player.y = 535
-    end    
+    if player.y > (game_height - paddle.h) then
+        player.y = (game_height - paddle.h)
+    end
 
-    --ball math???
+    --com bounds
+    if com.y < 0 then
+        com.y = 0
+    end
+    if com.y > (game_height - paddle.h) then
+        com.y = (game_height - paddle.h)
+    end
+
+    --ball math
     ball.x = ball.x + (ball.vx * dt)
     ball.y = ball.y + (ball.vy * dt)
     
-    --bounds
+    --ball bounds
     if ball.y <= 0 and ball.vy < 0 then
         ball.y = 0
         ball.vy = -ball.vy 
