@@ -75,11 +75,11 @@ function love.update(dt)
         ball.vy = -ball.vy
     end
 
-    if (ball.x > com.x - com.width and 
-    ball.x - ball.width < com.x and
-    ball.y > com.y + com.height and
-    ball.y + ball.height < com.y) then
-        ball.x = com.x
+    --com collision
+    if ball.x < com.x + com.width and -- Checks if the ball is to the left of com
+        ball.x + ball.width > com.x and -- Checks if the com is left of the ball (or ball right of com)
+        ball.y < com.y + com.height and -- Checks if the ball is above the com
+        ball.y + ball.height > com.y then -- Checks if the com is above the ball (or ball below com)
         ball.vx = -ball.vx
     end
 end
