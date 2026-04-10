@@ -5,7 +5,7 @@ function love.load()
     game_width = 800   
     
     player = {}
-        player.x = game_width/12
+        player.x = 60
         player.y = game_height/2
         player.speed = 5
         player.width = 10
@@ -81,6 +81,14 @@ function love.update(dt)
         ball.y < com.y + com.height and -- Checks if the ball is above the com
         ball.y + ball.height > com.y then -- Checks if the com is above the ball (or ball below com)
         ball.vx = -ball.vx
+    end
+
+    --player collision
+    if ball.x < player.x + player.width and
+        ball.x + ball.width > player.x and
+        ball.y < player.y + player.height and
+        ball.y + ball.height > player.y then
+        ball.vx = -ball.vx    
     end
 end
 
