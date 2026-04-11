@@ -16,8 +16,9 @@ function love.load()
     player = {}
         player.x = 60
         player.y = (game_height/2) - (paddle.h/2)
-        player.speed = 5
-        player.v = 0.1
+        player.speed = 0
+        player.vi = 0.5
+        player.vd = 0.25
         player.width = 10
         player.height = 65
 
@@ -27,11 +28,10 @@ function love.load()
         com.speed = 10
         com.width = 10
         com.height = 65
+
     score = {}
         score.player = 0
         score.com = 0
-    
-
     
     ball = {}
         ball.x = game_width/2
@@ -53,23 +53,51 @@ end
 function love.update(dt)
     --Com code
     --Need to fix 'speed match' bug
-    if com.y + paddle.h / 2 < ball.y then
+    if math.min(com.y + paddle.h / 2, ball.y) then
         com.y = math.min(com.y + com.speed, ball.y)
     end
 
-    if com.y + paddle.h / 2 > ball.y then
+    if math.min(com.y + paddle.h / 2, ball.y) then
         com.y = math.max(com.y - com.speed, ball.y)
     end
 
 
     --player controller
     if love.keyboard.isDown("up") then
-        player.y = player.y - player.speed
+        if player.speed > 0 then
+            player.speed = 0
+        end
+        player.speed = player.speed - player.vi
+        if player.speed < -5 then
+            player.speed = -5
+        end
+    else
+        if love.keyboard.isDown("down") then
+            if player.speed < 0 then
+                player.speed = 0
+            end
+        player.speed = player.speed + player.vi
+            if player.speed > 5 then
+                player.speed = 5
+            end
+        else
+            if player.speed > 0 then
+                player.speed = player.speed - player.vd
+                if player.speed < 0 then
+                    player.speed = 0
+                end
+            end
+
+            if player.speed < 0 then
+                player.speed = player.speed + player.vd
+                if player.speed > 0 then
+                    player.speed = 0
+                end
+            end
+        end        
     end
 
-    if love.keyboard.isDown("down") then
-        player.y = player.y + player.speed
-    end
+    player.y = player.y + player.speed
 
     --player bounds
     if player.y < 0 then
@@ -102,15 +130,19 @@ function love.update(dt)
         ball.vy = -ball.vy
     end
 
+
+    --Fix top speed boundary break
     --com collision
     if isCollide(ball, com) then
         ball.x = ball.x - 1
+        ball.vx = ball.vx + 50
         ball.vx = -ball.vx
     end
 
     --player collision
     if isCollide(ball, player) then
         ball.x = ball.x + 1
+        ball.vx = ball.vx - 50
         ball.vx = -ball.vx
     end
 
@@ -118,10 +150,14 @@ function love.update(dt)
     if ball.x < 0 then
         ball.x = game_width/2
         ball.y = game_height/2
+        ball.vx = 100
+        ball.vy = 100
         score.com = score.com + 1
     elseif ball.x > game_width then
         ball.x = game_width/2
         ball.y = game_height/2
+        ball.vx = 100
+        ball.vy = 100
         score.player = score.player + 1       
     end
 end
@@ -141,5 +177,5 @@ function love.draw()
     love.graphics.print(score.com, 600, 60, 0, 2, 2)
 
     --TEMP draw player.speed
-    love.graphics.print(player.speed, 20, 20, 0, 1, 1)
+    love.graphics.print(ball.vx, 20, 20, 0, 1, 1)
 end
