@@ -27,7 +27,6 @@ function love.load()
         player.vd = 0.30
         player.width = 10
         player.height = 65
-        player.bonusWB = 0
 
     com = {}
         com.x = (game_width * 15/16) - paddle.w
@@ -47,7 +46,11 @@ function love.load()
         ball.vy = 100
         ball.width = 10
         ball.height = 10
-    
+
+    bonus = {}
+        bonus.wallbounce = 0
+        bonus.ballspeed = 1
+
     --AABB Collision Function
     function isCollide(a, b)
         return a.x < b.x + b.width and
@@ -121,6 +124,7 @@ function love.update(dt)
         player.cap = player.cap + 0.5
         player.vd = 0.25
         player.speed = -player.speed
+        bonus.wallbounce = bonus.wallbounce + 5
     end
 
     if player.y > (game_height - paddle.h) then
@@ -128,6 +132,7 @@ function love.update(dt)
         player.cap = player.cap + 0.5
         player.vd = 0.25
         player.speed = -player.speed
+        bonus.wallbounce = bonus.wallbounce + 5
     end
 
     --Friction control cap
@@ -145,6 +150,7 @@ function love.update(dt)
     if player.speed == 0 then
         player.vd = 0.30
         player.cap = 5
+        bonus.wallbounce = 0
     end
 
     --com bounds
@@ -174,6 +180,9 @@ function love.update(dt)
     --com collision
     if isCollide(ball, com) then
         ball.x = com.x - ball.width
+        if ball.vx > 500 then
+            bonus.ballspeed = bonus.ballspeed + 0.1
+        end         
         ball.vx = ball.vx + 50
         ball.vx = -ball.vx
         score.com = score.com + 10
@@ -182,9 +191,13 @@ function love.update(dt)
     --player collision
     if isCollide(ball, player) then
         ball.x = player.x + ball.width
+        if ball.vx < -500 then
+            bonus.ballspeed = bonus.ballspeed + 0.1
+        end        
         ball.vx = ball.vx - 50
         ball.vx = -ball.vx
-        score.player = score.player + 10
+        score.player = score.player + 10 + bonus.wallbounce
+
     end
 
     --score and reset system
@@ -193,13 +206,17 @@ function love.update(dt)
         ball.y = game_height/2
         ball.vx = 100
         ball.vy = 100
-        score.com = score.com + 100
+        score.com = (score.com + 100) * bonus.ballspeed
+        bonus.ballspeed = 1
+        bonus.wallbounce = 0
     elseif ball.x > game_width then
         ball.x = game_width/2
         ball.y = game_height/2
         ball.vx = 100
         ball.vy = 100
-        score.player = score.player + 100       
+        score.player = (score.player + 100 + bonus.wallbounce) * bonus.ballspeed
+        bonus.ballspeed = 1
+        bonus.wallbounce = 0
     end
 end
 
@@ -240,7 +257,11 @@ function love.draw()
     --TEMP draw player.vd
     --love.graphics.print(player.vd, 20, 50, 0, 1, 1)
     --TEMP draw ball.vx
-    --love.graphics.print(ball.vx, 20, 80, 0, 1, 1)
+    love.graphics.print(ball.vx, 20, 80, 0, 1, 1)
+    --TEMP draw wallbounce bonus
+    love.graphics.print(bonus.wallbounce, 20, 10, 0, 1, 1)
+    --TEMP draw ballspeed bonus
+    love.graphics.print(bonus.ballspeed, 20, 35, 0, 1, 1)
 
     gameFont:setFilter("nearest", "nearest")
 end
