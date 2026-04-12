@@ -6,24 +6,27 @@
 --  - Add charge mechanic
 
 function love.load()
-    game_height = 600
-    game_width = 800   
+    game_height = 400
+    game_width = 400       
+    
+    love.window.setMode(game_width, game_height)
 
     paddle = {}
         paddle.w = 10
         paddle.h = 65    
     
     player = {}
-        player.x = 60
+        player.x = (game_width/16)
         player.y = (game_height/2) - (paddle.h/2)
         player.speed = 0
+        player.cap = 5
         player.vi = 0.5
-        player.vd = 0.25
+        player.vd = 0.30
         player.width = 10
         player.height = 65
 
     com = {}
-        com.x = 730
+        com.x = (game_width * 15/16) - paddle.w
         com.y = (game_height/2) - (paddle.h/2)
         com.speed = 10
         com.width = 10
@@ -40,7 +43,7 @@ function love.load()
         ball.vy = 100
         ball.width = 10
         ball.height = 10
-
+    
     --AABB Collision Function
     function isCollide(a, b)
         return a.x < b.x + b.width and
@@ -63,13 +66,18 @@ function love.update(dt)
 
 
     --player controller
+    --Clean this shit up later
+    if love.keyboard.isDown("space") then
+        player.vd = 1
+    end
+
     if love.keyboard.isDown("up") then
         if player.speed > 0 then
             player.speed = 0
         end
         player.speed = player.speed - player.vi
-        if player.speed < -5 then
-            player.speed = -5
+        if player.speed < -player.cap then
+            player.speed = -player.cap
         end
     else
         if love.keyboard.isDown("down") then
@@ -77,8 +85,8 @@ function love.update(dt)
                 player.speed = 0
             end
         player.speed = player.speed + player.vi
-            if player.speed > 5 then
-                player.speed = 5
+            if player.speed > player.cap then
+                player.speed = player.cap
             end
         else
             if player.speed > 0 then
@@ -102,10 +110,20 @@ function love.update(dt)
     --player bounds
     if player.y < 0 then
         player.y = 0
+        player.vd = 0.1
+        player.speed = -player.speed
     end
 
     if player.y > (game_height - paddle.h) then
         player.y = (game_height - paddle.h)
+        player.vd = 0.1
+        player.speed = -player.speed
+
+    end
+   
+    --Anti broken wall bounce
+    if player.speed == 0 then
+        player.vd = 0.30
     end
 
     --com bounds
@@ -173,9 +191,11 @@ function love.draw()
     love.graphics.rectangle("fill", ball.x, ball.y, ball.width, ball.height)
 
     --draw scores
-    love.graphics.print(score.player, 200, 60, 0, 2, 2)
-    love.graphics.print(score.com, 600, 60, 0, 2, 2)
+    love.graphics.print(score.player, (game_width * 1/4), 60, 0, 2, 2)
+    love.graphics.print(score.com, (game_width * 3/4), 60, 0, 2, 2)
 
     --TEMP draw player.speed
-    love.graphics.print(ball.vx, 20, 20, 0, 1, 1)
+    love.graphics.print(player.speed, 20, 20, 0, 1, 1)
+    --TEMP draw player.vd
+    love.graphics.print(player.vd, 20, 50, 0, 1, 1)
 end
