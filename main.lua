@@ -288,6 +288,9 @@ function love.update(dt)
         ball.vx = -1000
     end
 
+    score.roundedplayer = math.floor(score.player + 0.5)
+    score.roundedcom = math.floor(score.com + 0.5)
+
     --score and reset system
     if ball.x < 0 then
         ball.x = game_width/2
@@ -323,8 +326,8 @@ function love.draw()
     --draw scores
     love.graphics.print("PLAYER 1", 112.5 - 30, 20, 0, 1, 1)
     love.graphics.print("PLAYER 2", (317.5-10), 20, 0, 1, 1)
-    love.graphics.print(score.player, (112.5 - 30), 30, 0, 2, 2)
-    love.graphics.print(score.com, (317.5-10), 30, 0, 2, 2)
+    love.graphics.print(score.roundedplayer, (112.5 - 30), 30, 0, 2, 2)
+    love.graphics.print(score.roundedcom, (317.5-10), 30, 0, 2, 2)
 
     --ball shadow
     love.graphics.setColor(0,0,0,0.2)
@@ -343,7 +346,7 @@ function love.draw()
     love.graphics.rectangle("fill", com.x, com.y, com.width, com.height)
 
     --TEMP draw player.speed
-    --love.graphics.print(player.speed, 20, 20, 0, 1, 1)
+    --love.graphics.print(score.player, 20, 20, 0, 1, 1)
     --TEMP draw player.vd
     --love.graphics.print(player.vd, 20, 50, 0, 1, 1)
     --TEMP draw ball.vx
