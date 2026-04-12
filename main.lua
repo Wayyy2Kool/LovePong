@@ -110,20 +110,28 @@ function love.update(dt)
     --player bounds
     if player.y < 0 then
         player.y = 0
+        player.cap = player.cap + 1
         player.vd = 0.1
         player.speed = -player.speed
     end
 
     if player.y > (game_height - paddle.h) then
         player.y = (game_height - paddle.h)
+        player.cap = player.cap + 1
         player.vd = 0.1
         player.speed = -player.speed
 
+    end
+
+    --Total player cap
+    if player.cap > 9 then
+        player.cap = 9
     end
    
     --Anti broken wall bounce
     if player.speed == 0 then
         player.vd = 0.30
+        player.cap = 5
     end
 
     --com bounds
@@ -136,8 +144,8 @@ function love.update(dt)
     end
 
     --ball math
-    ball.x = ball.x + (ball.vx * dt)
-    ball.y = ball.y + (ball.vy * dt)
+    --ball.x = ball.x + (ball.vx * dt)
+    --ball.y = ball.y + (ball.vy * dt)
     
     --ball bounds
     if ball.y <= 0 and ball.vy < 0 then
