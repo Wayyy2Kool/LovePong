@@ -41,6 +41,8 @@ function love.load()
     score = {}
         score.player = 0
         score.com = 0
+        score.stockplayer = 0
+        score.stockcom = 0
         score.roundedplayer = 0
         score.roundedcom = 0
     
@@ -297,19 +299,25 @@ function love.update(dt)
         ball.y = game_height/2
         ball.vx = 100
         ball.vy = 100
-        score.com = (score.com + 100) * bonus.ballspeed
+        score.stockcom = (score.stockcom + 100) * bonus.ballspeed
+        score.com = score.com + score.stockcom
         bonus.ballspeed = 1
         bonus.wbp1 = 0
         bonus.wbp2 = 0
+        score.stockcom = 0
+        score.stockplayer = 0
     elseif ball.x > game_width then
         ball.x = game_width/2
         ball.y = game_height/2
         ball.vx = 100
         ball.vy = 100
-        score.player = (score.player + 100 + bonus.wbp1) * bonus.ballspeed
+        score.stockplayer = (score.stockplayer + 100 + bonus.wbp1) * bonus.ballspeed
+        score.player = score.player + score.stockplayer
         bonus.ballspeed = 1
         bonus.wbp1 = 0
         bonus.wbp2 = 0
+        score.stockcom = 0
+        score.stockplayer = 0
     end
 end
 
@@ -344,17 +352,6 @@ function love.draw()
 
     --draw computer
     love.graphics.rectangle("fill", com.x, com.y, com.width, com.height)
-
-    --TEMP draw player.speed
-    --love.graphics.print(score.player, 20, 20, 0, 1, 1)
-    --TEMP draw player.vd
-    --love.graphics.print(player.vd, 20, 50, 0, 1, 1)
-    --TEMP draw ball.vx
-    --love.graphics.print(ball.vx, 20, 80, 0, 1, 1)
-    --TEMP draw wallbounce bonus
-    --love.graphics.print(bonus.wbp1, 20, 10, 0, 1, 1)
-    --TEMP draw ballspeed bonus
-    --love.graphics.print(bonus.ballspeed, 20, 35, 0, 1, 1)
 
     gameFont:setFilter("nearest", "nearest")
 end
