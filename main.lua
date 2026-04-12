@@ -10,7 +10,7 @@ function love.load()
     game_width = 450     
     
     love.window.setMode(game_width, game_height)
-    love.graphics.setBackgroundColor(0.9, 0.55, 0.7)
+    love.graphics.setBackgroundColor(0.8, 0.45, 0.6)
 
     gameFont = love.graphics.newFont("font/gamefont.ttf", 10)
 
@@ -20,7 +20,7 @@ function love.load()
     
     player = {}
         player.x = (game_width/16)
-        player.y = (game_height/2) - (paddle.h/2)
+        player.y = (game_height/2 + 50) - (paddle.h/2)
         player.speed = 0
         player.cap = 5
         player.vi = 0.5
@@ -30,7 +30,7 @@ function love.load()
 
     com = {}
         com.x = (game_width * 15/16) - paddle.w
-        com.y = (game_height/2) - (paddle.h/2)
+        com.y = (game_height/2 + 50) - (paddle.h/2)
         com.speed = 0
         com.cap = 5
         com.vi = 0.5
@@ -41,6 +41,8 @@ function love.load()
     score = {}
         score.player = 0
         score.com = 0
+        score.roundedplayer = 0
+        score.roundedcom = 0
     
     ball = {}
         ball.x = game_width/2
@@ -55,6 +57,10 @@ function love.load()
         bonus.wbp2 = 0
         bonus.ballspeed = 1
 
+    sound = {}
+    sound.hit = love.audio.newSource("sfx/hit1.ogg", "static")
+    sound.hit2 = love.audio.newSource("sfx/hit2.ogg", "static")
+
     --AABB Collision Function
     function isCollide(a, b)
         return a.x < b.x + b.width and
@@ -63,8 +69,8 @@ function love.load()
                a.y + a.height > b.y
     end
 
-    function shadowDraw(a)
-        return 
+    function round(n)
+        return math.floor(n + 0.5)
     end
 end
 
@@ -183,7 +189,7 @@ function love.update(dt)
         bonus.wbp1 = 0
     end
 
-    --player bounds
+    --com bounds
     if com.y < 100 then
         com.y = 100
         com.cap = com.cap + 0.5
@@ -249,9 +255,11 @@ function love.update(dt)
     --Fix top speed boundary break (IMPORTANT)
     --com collision
     if isCollide(ball, com) then
+        sound.hit:play()
         ball.x = com.x - ball.width
         if ball.vx > 500 then
             bonus.ballspeed = bonus.ballspeed + 0.1
+            sound.hit2:play()
         end         
         ball.vx = ball.vx + 50
         ball.vx = -ball.vx
@@ -260,13 +268,15 @@ function love.update(dt)
 
     --player collision
     if isCollide(ball, player) then
+        sound.hit:play()    
         ball.x = player.x + ball.width
         if ball.vx < -500 then
             bonus.ballspeed = bonus.ballspeed + 0.1
+            sound.hit2:play()
         end        
         ball.vx = ball.vx - 50
         ball.vx = -ball.vx
-        score.player = score.player + 10 + bonus.wbp1
+        score.player = score.player + 10 + bonus.wbp2
     end
 
     --ball speed cap
