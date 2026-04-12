@@ -62,6 +62,11 @@ function love.load()
     sound = {}
     sound.hit = love.audio.newSource("sfx/hit1.ogg", "static")
     sound.hit2 = love.audio.newSource("sfx/hit2.ogg", "static")
+    sound.music = love.audio.newSource("sfx/bgm.mp3", "stream")
+    
+    sound.music:setLooping(true)
+    sound.music:setVolume(0.5)
+    sound.music:play()
 
     --AABB Collision Function
     function isCollide(a, b)
@@ -261,6 +266,7 @@ function love.update(dt)
         ball.x = com.x - ball.width
         if ball.vx > 500 then
             bonus.ballspeed = bonus.ballspeed + 0.1
+            sound.hit:stop()
             sound.hit2:play()
         end         
         ball.vx = ball.vx + 50
@@ -274,6 +280,7 @@ function love.update(dt)
         ball.x = player.x + ball.width
         if ball.vx < -500 then
             bonus.ballspeed = bonus.ballspeed + 0.1
+            sound.hit:stop()
             sound.hit2:play()
         end        
         ball.vx = ball.vx - 50
@@ -294,6 +301,7 @@ function love.update(dt)
     score.roundedcom = math.floor(score.com + 0.5)
 
     --score and reset system
+    --player 2 score
     if ball.x < 0 then
         ball.x = game_width/2
         ball.y = game_height/2
@@ -303,9 +311,10 @@ function love.update(dt)
         score.com = score.com + score.stockcom
         bonus.ballspeed = 1
         bonus.wbp1 = 0
-        bonus.wbp2 = 0
+        player.speed = 0
         score.stockcom = 0
         score.stockplayer = 0
+    --player 1 score
     elseif ball.x > game_width then
         ball.x = game_width/2
         ball.y = game_height/2
@@ -314,8 +323,8 @@ function love.update(dt)
         score.stockplayer = (score.stockplayer + 100 + bonus.wbp1) * bonus.ballspeed
         score.player = score.player + score.stockplayer
         bonus.ballspeed = 1
-        bonus.wbp1 = 0
         bonus.wbp2 = 0
+        com.speed = 0
         score.stockcom = 0
         score.stockplayer = 0
     end
@@ -332,10 +341,12 @@ function love.draw()
     love.graphics.setFont(gameFont)
     
     --draw scores
-    love.graphics.print("PLAYER 1", 112.5 - 30, 20, 0, 1, 1)
-    love.graphics.print("PLAYER 2", (317.5-10), 20, 0, 1, 1)
-    love.graphics.print(score.roundedplayer, (112.5 - 30), 30, 0, 2, 2)
-    love.graphics.print(score.roundedcom, (317.5-10), 30, 0, 2, 2)
+    love.graphics.print("PLAYER 1", 112.5 - 30, 10, 0, 1, 1)
+    love.graphics.print("PLAYER 2", (317.5-10), 10, 0, 1, 1)
+    love.graphics.print(score.roundedplayer, (112.5 - 30), 20, 0, 2, 2)
+    love.graphics.print(score.roundedcom, (317.5-10), 20, 0, 2, 2)
+    love.graphics.print("Bonus: "..bonus.wbp1, 112.5 - 30, 62, 0, 1, 1)
+    love.graphics.print("Bonus: "..bonus.wbp2, (317.5-10), 62, 0, 1, 1)
 
     --ball shadow
     love.graphics.setColor(0,0,0,0.2)
