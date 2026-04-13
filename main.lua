@@ -1,12 +1,14 @@
 -- PONG Project
 
 --  TO DO LIST:
---  - Improve the com player code
 --  - Improve the ball physics (angle and speed velocity)
---  - Keep improving the wall bounce mechanic
+--  - Bug fixes
+--  - Fix wallbounce time window
+--  - Pause menu
+--  - End Goal
 
 function love.load()
-    game_height = 500
+    game_height = 530
     game_width = 450     
     
     love.window.setMode(game_width, game_height)
@@ -20,7 +22,7 @@ function love.load()
     
     player = {}
         player.x = (game_width/16)
-        player.y = (game_height/2 + 50) - (paddle.h/2)
+        player.y = (game_height/2 + 100) - (paddle.h/2)
         player.speed = 0
         player.cap = 5
         player.vi = 0.5
@@ -30,7 +32,7 @@ function love.load()
 
     com = {}
         com.x = (game_width * 15/16) - paddle.w
-        com.y = (game_height/2 + 50) - (paddle.h/2)
+        com.y = (game_height/2 + 100) - (paddle.h/2)
         com.speed = 0
         com.cap = 5
         com.vi = 0.5
@@ -53,6 +55,11 @@ function love.load()
         ball.vy = 100
         ball.width = 10
         ball.height = 10
+    
+    stock = {}
+        stock.total = 5
+        stock.x = 112.5 - 30
+        stock.y = 90
 
     bonus = {}
         bonus.wbp1 = 0
@@ -162,8 +169,8 @@ function love.update(dt)
     player.y = player.y + player.speed
 
     --player bounds
-    if player.y < 100 then
-        player.y = 100
+    if player.y < 130 then
+        player.y = 130
         player.cap = player.cap + 0.5
         player.vd = 0.25
         player.speed = -player.speed
@@ -197,8 +204,8 @@ function love.update(dt)
     end
 
     --com bounds
-    if com.y < 100 then
-        com.y = 100
+    if com.y < 130 then
+        com.y = 130
         com.cap = com.cap + 0.5
         com.vd = 0.25
         com.speed = -com.speed
@@ -237,8 +244,8 @@ function love.update(dt)
     ball.y = ball.y + (ball.vy * dt)
     
     --ball bounds
-    if ball.y <= 100 and ball.vy < 0 then
-        ball.y = 100
+    if ball.y <= 130 and ball.vy < 0 then
+        ball.y = 130
         ball.vy = -ball.vy 
     elseif ball.y >= (game_height - ball.height) and ball.vy > 0 then
         ball.y = (game_height - ball.height)
@@ -262,12 +269,13 @@ function love.update(dt)
     --Fix top speed boundary break (IMPORTANT)
     --com collision
     if isCollide(ball, com) then
-        sound.hit:play()
+        local clone1 = sound.hit:clone()
+        clone1:play()
         ball.x = com.x - ball.width
         if ball.vx > 500 then
             bonus.ballspeed = bonus.ballspeed + 0.1
-            sound.hit:stop()
-            sound.hit2:play()
+            local clone2 = sound.hit2:clone()
+            clone2:play()
         end         
         ball.vx = ball.vx + 50
         ball.vx = -ball.vx
@@ -276,12 +284,13 @@ function love.update(dt)
 
     --player collision
     if isCollide(ball, player) then
-        sound.hit:play()    
+        local clone1 = sound.hit:clone()
+        clone1:play() 
         ball.x = player.x + ball.width
         if ball.vx < -500 then
             bonus.ballspeed = bonus.ballspeed + 0.1
-            sound.hit:stop()
-            sound.hit2:play()
+            local clone2 = sound.hit2:clone()
+            clone2:play()
         end        
         ball.vx = ball.vx - 50
         ball.vx = -ball.vx
@@ -314,6 +323,7 @@ function love.update(dt)
         player.speed = 0
         score.stockcom = 0
         score.stockplayer = 0
+        stock.total = stock.total - 1
     --player 1 score
     elseif ball.x > game_width then
         ball.x = game_width/2
@@ -327,6 +337,12 @@ function love.update(dt)
         com.speed = 0
         score.stockcom = 0
         score.stockplayer = 0
+        stock.total = stock.total - 1
+    end
+    if stock.total == 0 then
+        score.com = 0
+        score.player = 0
+        stock.total = 5
     end
 end
 
@@ -334,7 +350,7 @@ function love.draw()
     love.graphics.setDefaultFilter("nearest", "nearest")
     
     love.graphics.setColor(0,0,0,1)
-    love.graphics.rectangle("fill", 0, 0, 600, 100)
+    love.graphics.rectangle("fill", 0, 0, 600, 130)
 
     love.graphics.setColor(1,1,1,1)
     --Set font
@@ -347,6 +363,10 @@ function love.draw()
     love.graphics.print(score.roundedcom, (317.5-10), 20, 0, 2, 2)
     love.graphics.print("Bonus: "..bonus.wbp1, 112.5 - 30, 62, 0, 1, 1)
     love.graphics.print("Bonus: "..bonus.wbp2, (317.5-10), 62, 0, 1, 1)
+
+    --TEMP version: draw stocks
+    love.graphics.print("STOCKS: "..stock.total, stock.x, stock.y, 0, 1, 1)
+
 
     --ball shadow
     love.graphics.setColor(0,0,0,0.2)
@@ -365,4 +385,13 @@ function love.draw()
     love.graphics.rectangle("fill", com.x, com.y, com.width, com.height)
 
     gameFont:setFilter("nearest", "nearest")
+    
+    if stock.total == 0 then
+        if score.player > score.com then
+            love.graphics.print("PLAYER 1 WINS!", (50), (game_width/2), 0, 2, 2)
+        end
+        if score.player < score.com then
+            love.graphics.print("PLAYER 2 WINS!", (50), (game_width/2), 0, 2, 2)
+        end
+    end
 end
