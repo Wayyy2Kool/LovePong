@@ -6,6 +6,7 @@
 --  - Fix wallbounce time window
 --  - Pause menu
 --  - End Goal
+--  - Test
 
 function love.load()
     game_height = 530
